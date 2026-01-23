@@ -1,11 +1,40 @@
 [project]
 name = "room-reservation"
 version = "0.1.0"
-description = "Add your description here"
+description = "API для бронирования переговорных комнат"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiosqlite>=0.22.1",
     "fastapi==0.115.5",
     "pydantic-settings==2.6.1",
+    "sqlalchemy[asyncio]>=2.0.46",
     "uvicorn[standard]==0.32.1",
+]
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "ANN"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.mypy]
+python_version = "3.12"
+disallow_untyped_defs = true
+ignore_missing_imports = true
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+
+[[tool.mypy.overrides]]
+module = "app.core.db"
+disable_error_code = ["misc", "arg-type", "attr-defined"]
+
+[tool.flake8]
+max-line-length = 79
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "ruff>=0.14.14",
 ]
