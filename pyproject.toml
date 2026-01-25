@@ -19,7 +19,10 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "ANN"]
-ignore = ["ANN101", "ANN102"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"app/api/*" = ["ANN201"]  # FastAPI handlers без return type
 
 [tool.mypy]
 python_version = "3.12"
@@ -30,6 +33,10 @@ plugins = ["sqlalchemy.ext.mypy.plugin"]
 [[tool.mypy.overrides]]
 module = "app.core.db"
 disable_error_code = ["misc", "arg-type", "attr-defined"]
+
+[[tool.mypy.overrides]]
+module = "app.api.*"
+disallow_untyped_defs = false  # FastAPI handlers без return type
 
 [tool.flake8]
 max-line-length = 79
