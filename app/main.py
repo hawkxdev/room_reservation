@@ -1,6 +1,8 @@
+"""Точка входа FastAPI приложения."""
+
 from fastapi import FastAPI
 
-from app.api.meeting_room import router
+from app.api.routers import main_router
 from app.core.config import settings
 
 app = FastAPI(
@@ -8,4 +10,4 @@ app = FastAPI(
     description=settings.description,
 )
 
-app.include_router(router)
+app.include_router(main_router)

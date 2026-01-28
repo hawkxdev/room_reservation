@@ -2,22 +2,19 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.validators import check_meeting_room_exists, check_name_duplicate
 from app.core.db import get_async_session
 from app.crud.meeting_room import meeting_room_crud
-from app.models.meeting_room import MeetingRoom
 from app.schemas.meeting_room import (
     MeetingRoomCreate,
     MeetingRoomDB,
     MeetingRoomUpdate,
 )
 
-router = APIRouter(
-    prefix="/meeting_rooms",
-    tags=["Meeting Rooms"],
-)
+router = APIRouter()
 
 SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
@@ -86,27 +83,3 @@ async def delete_meeting_room_by_id(room_id: int, session: SessionDep):
     room = await check_meeting_room_exists(room_id, session)
     deleted_room = await meeting_room_crud.remove(room, session)
     return deleted_room
-
-
-async def check_name_duplicate(room_name: str, session: AsyncSession) -> None:
-    """Проверить уникальность имени переговорки."""
-    room_id = await meeting_room_crud.get_room_id_by_name(room_name, session)
-    if room_id is not None:
-        raise HTTPException(
-            status_code=422,
-            detail="Переговорка с таким именем уже существует!",
-        )
-
-
-async def check_meeting_room_exists(
-    room_id: int,
-    session: AsyncSession,
-) -> MeetingRoom:
-    """Проверить, что переговорка существует."""
-    meeting_room = await meeting_room_crud.get(room_id, session)
-    if meeting_room is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Переговорка не найдена!",
-        )
-    return meeting_room
