@@ -35,6 +35,10 @@ module = "app.core.db"
 disable_error_code = ["misc", "arg-type", "attr-defined"]
 
 [[tool.mypy.overrides]]
+module = "app.crud.base"
+disable_error_code = ["attr-defined"]  # Generic model.id
+
+[[tool.mypy.overrides]]
 module = "app.api.*"
 disallow_untyped_defs = false  # FastAPI handlers без return type
 
