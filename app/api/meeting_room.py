@@ -20,13 +20,16 @@ from app.schemas.meeting_room import (
     MeetingRoomUpdate,
 )
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/meeting_rooms",
+    tags=["Meeting Rooms"],
+)
 
 SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
 
 @router.post(
-    "/meeting_rooms",
+    "/",
     response_model=MeetingRoomDB,
     response_model_exclude_none=True,
 )
@@ -46,7 +49,7 @@ async def create_new_meeting_room(
 
 
 @router.get(
-    "/meeting_rooms",
+    "/",
     response_model=list[MeetingRoomDB],
     response_model_exclude_none=True,
 )
@@ -57,7 +60,7 @@ async def get_all_meeting_rooms(session: SessionDep):
 
 
 @router.get(
-    "/meeting_rooms/{room_id}",
+    "/{room_id}",
     response_model=MeetingRoomDB,
     response_model_exclude_none=True,
 )
@@ -73,7 +76,7 @@ async def get_meeting_room(room_id: int, session: SessionDep):
 
 
 @router.patch(
-    "/meeting_rooms/{room_id}",
+    "/{room_id}",
     response_model=MeetingRoomDB,
     response_model_exclude_none=True,
 )
@@ -101,7 +104,7 @@ async def update_meeting_room_by_id(
 
 
 @router.delete(
-    "/meeting_rooms/{room_id}",
+    "/{room_id}",
     response_model=MeetingRoomDB,
     response_model_exclude_none=True,
 )
