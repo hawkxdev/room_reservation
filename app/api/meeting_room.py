@@ -14,6 +14,7 @@ from app.crud.meeting_room import (
     read_room_from_db,
     update_meeting_room,
 )
+from app.models.meeting_room import MeetingRoom
 from app.schemas.meeting_room import (
     MeetingRoomCreate,
     MeetingRoomDB,
@@ -61,13 +62,7 @@ async def get_all_meeting_rooms(session: SessionDep):
 )
 async def get_meeting_room(room_id: int, session: SessionDep):
     """Получение переговорки по id."""
-    room = await read_room_from_db(room_id, session)
-    if room is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Переговорка не найдена",
-        )
-    return room
+    return await check_meeting_room_exists(room_id, session)
 
 
 @router.patch(
@@ -81,12 +76,7 @@ async def update_meeting_room_by_id(
     session: SessionDep,
 ):
     """Обновление переговорки по id."""
-    room = await read_room_from_db(room_id, session)
-    if room is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Переговорка не найдена",
-        )
+    room = await check_meeting_room_exists(room_id, session)
     if obj_in.name is not None and obj_in.name != room.name:
         await check_name_duplicate(obj_in.name, session)
     updated_room = await update_meeting_room(room, obj_in, session)
@@ -100,12 +90,7 @@ async def update_meeting_room_by_id(
 )
 async def delete_meeting_room_by_id(room_id: int, session: SessionDep):
     """Удаление переговорки по id."""
-    room = await read_room_from_db(room_id, session)
-    if room is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Переговорка не найдена",
-        )
+    room = await check_meeting_room_exists(room_id, session)
     deleted_room = await delete_meeting_room(room, session)
     return deleted_room
 
@@ -118,3 +103,17 @@ async def check_name_duplicate(room_name: str, session: AsyncSession) -> None:
             status_code=422,
             detail="Переговорка с таким именем уже существует!",
         )
+
+
+async def check_meeting_room_exists(
+    room_id: int,
+    session: AsyncSession,
+) -> MeetingRoom:
+    """Проверить, что переговорка существует."""
+    meeting_room = await read_room_from_db(room_id, session)
+    if meeting_room is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Переговорка не найдена!",
+        )
+    return meeting_room
