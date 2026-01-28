@@ -38,12 +38,7 @@ async def create_new_meeting_room(
     session: SessionDep,
 ):
     """Создание новой переговорки."""
-    room_id = await get_room_id_by_name(meeting_room.name, session)
-    if room_id is not None:
-        raise HTTPException(
-            status_code=422,
-            detail="Переговорка с таким именем уже существует!",
-        )
+    await check_name_duplicate(meeting_room.name, session)
     new_room = await create_meeting_room(meeting_room, session)
     return new_room
 
@@ -93,12 +88,7 @@ async def update_meeting_room_by_id(
             detail="Переговорка не найдена",
         )
     if obj_in.name is not None and obj_in.name != room.name:
-        existing_room_id = await get_room_id_by_name(obj_in.name, session)
-        if existing_room_id is not None:
-            raise HTTPException(
-                status_code=422,
-                detail="Переговорка с таким именем уже существует!",
-            )
+        await check_name_duplicate(obj_in.name, session)
     updated_room = await update_meeting_room(room, obj_in, session)
     return updated_room
 
@@ -118,3 +108,13 @@ async def delete_meeting_room_by_id(room_id: int, session: SessionDep):
         )
     deleted_room = await delete_meeting_room(room, session)
     return deleted_room
+
+
+async def check_name_duplicate(room_name: str, session: AsyncSession) -> None:
+    """Проверить уникальность имени переговорки."""
+    room_id = await get_room_id_by_name(room_name, session)
+    if room_id is not None:
+        raise HTTPException(
+            status_code=422,
+            detail="Переговорка с таким именем уже существует!",
+        )
