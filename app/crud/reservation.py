@@ -17,21 +17,24 @@ class CRUDReservation(
 
     async def get_reservations_at_the_same_time(
         self,
+        *,
         from_reserve: datetime,
         to_reserve: datetime,
         meetingroom_id: int,
+        reservation_id: int | None = None,
         session: AsyncSession,
     ) -> list[Reservation]:
         """Найти бронирования пересекающиеся по времени."""
-        result = await session.execute(
-            select(Reservation).where(
-                Reservation.meetingroom_id == meetingroom_id,
-                and_(
-                    from_reserve <= Reservation.to_reserve,
-                    to_reserve >= Reservation.from_reserve,
-                ),
-            )
+        statement = select(Reservation).where(
+            Reservation.meetingroom_id == meetingroom_id,
+            and_(
+                from_reserve <= Reservation.to_reserve,
+                to_reserve >= Reservation.from_reserve,
+            ),
         )
+        if reservation_id is not None:
+            statement = statement.where(Reservation.id != reservation_id)
+        result = await session.execute(statement)
         return list(result.scalars().all())
 
 

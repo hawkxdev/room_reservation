@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.meeting_room import meeting_room_crud
 from app.crud.reservation import reservation_crud
 from app.models.meeting_room import MeetingRoom
+from app.models.reservation import Reservation
 
 
 async def check_name_duplicate(
@@ -42,12 +43,14 @@ async def check_reservation_intersections(
     to_reserve: datetime,
     meetingroom_id: int,
     session: AsyncSession,
+    reservation_id: int | None = None,
 ) -> None:
     """Проверить что время бронирования не пересекается с существующими."""
     reservations = await reservation_crud.get_reservations_at_the_same_time(
         from_reserve=from_reserve,
         to_reserve=to_reserve,
         meetingroom_id=meetingroom_id,
+        reservation_id=reservation_id,
         session=session,
     )
     if reservations:
@@ -55,3 +58,14 @@ async def check_reservation_intersections(
             status_code=422,
             detail=str(reservations),
         )
+
+
+async def check_reservation_before_edit(
+    reservation_id: int,
+    session: AsyncSession,
+) -> Reservation:
+    """Проверить что бронирование существует."""
+    reservation = await reservation_crud.get(reservation_id, session)
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Бронь не найдена!")
+    return reservation
