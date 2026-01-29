@@ -37,5 +37,19 @@ class CRUDReservation(
         result = await session.execute(statement)
         return list(result.scalars().all())
 
+    async def get_future_reservations_for_room(
+        self,
+        room_id: int,
+        session: AsyncSession,
+    ) -> list[Reservation]:
+        """Получить будущие бронирования для переговорки."""
+        result = await session.execute(
+            select(Reservation).where(
+                Reservation.meetingroom_id == room_id,
+                Reservation.to_reserve > datetime.now(),
+            )
+        )
+        return list(result.scalars().all())
+
 
 reservation_crud = CRUDReservation(Reservation)
