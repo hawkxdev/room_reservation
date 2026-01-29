@@ -17,3 +17,6 @@ class Reservation(CommonMixin, Base):
         Integer,
         ForeignKey('meetingroom.id')
     )
+
+    def __repr__(self) -> str:
+        return f"Забронировано с {self.from_reserve} по {self.to_reserve}"
