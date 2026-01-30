@@ -1,6 +1,7 @@
 """Pydantic-схемы для бронирования переговорок."""
 
 from datetime import datetime, timedelta
+from typing import Optional
 
 from pydantic import (
     BaseModel,
@@ -63,5 +64,6 @@ class ReservationDB(ReservationBase):
 
     id: int
     meetingroom_id: int
+    user_id: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)

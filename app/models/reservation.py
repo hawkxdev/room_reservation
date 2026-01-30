@@ -17,6 +17,11 @@ class Reservation(CommonMixin, Base):
         Integer,
         ForeignKey('meetingroom.id')
     )
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey('user.id'),
+        nullable=True
+    )
 
     def __repr__(self) -> str:
         return f"Забронировано с {self.from_reserve} по {self.to_reserve}"

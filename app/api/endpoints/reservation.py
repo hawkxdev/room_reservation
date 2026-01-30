@@ -11,6 +11,8 @@ from app.api.validators import (
     check_reservation_intersections,
 )
 from app.core.db import get_async_session
+from app.core.user import current_user
+from app.models import User
 from app.crud.reservation import reservation_crud
 from app.schemas.reservation import (
     ReservationCreate,
@@ -26,6 +28,7 @@ SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 async def create_reservation(
     reservation: ReservationCreate,
     session: SessionDep,
+    user: Annotated[User, Depends(current_user)],
 ):
     """Создать бронирование переговорки."""
     await check_meeting_room_exists(reservation.meetingroom_id, session)
@@ -35,7 +38,7 @@ async def create_reservation(
         meetingroom_id=reservation.meetingroom_id,
         session=session,
     )
-    new_reservation = await reservation_crud.create(reservation, session)
+    new_reservation = await reservation_crud.create(reservation, session, user)
     return new_reservation
 
 
