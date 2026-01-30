@@ -43,6 +43,10 @@ disable_error_code = ["attr-defined"]  # Generic model.id
 module = "app.api.*"
 disallow_untyped_defs = false  # FastAPI handlers без return type
 
+[[tool.mypy.overrides]]
+module = "app.core.user"
+disable_error_code = ["override"]  # BaseUserManager[User, int] generic TypeVar
+
 [tool.flake8]
 max-line-length = 79
 
