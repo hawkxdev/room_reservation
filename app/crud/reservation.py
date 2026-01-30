@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
 from app.models.reservation import Reservation
+from app.models.user import User
 from app.schemas.reservation import ReservationCreate, ReservationUpdate
 
 
@@ -48,6 +49,17 @@ class CRUDReservation(
                 Reservation.meetingroom_id == room_id,
                 Reservation.to_reserve > datetime.now(),
             )
+        )
+        return list(result.scalars().all())
+
+    async def get_by_user(
+        self,
+        session: AsyncSession,
+        user: User,
+    ) -> list[Reservation]:
+        """Получить бронирования текущего пользователя."""
+        result = await session.execute(
+            select(Reservation).where(Reservation.user_id == user.id)
         )
         return list(result.scalars().all())
 

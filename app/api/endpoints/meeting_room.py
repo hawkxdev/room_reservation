@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.validators import check_meeting_room_exists, check_name_duplicate
 from app.core.db import get_async_session
+from app.core.user import current_superuser
 from app.crud.meeting_room import meeting_room_crud
 from app.crud.reservation import reservation_crud
 from app.schemas.meeting_room import (
@@ -25,12 +26,13 @@ SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
     "/",
     response_model=MeetingRoomDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)],
 )
 async def create_new_meeting_room(
     meeting_room: MeetingRoomCreate,
     session: SessionDep,
 ):
-    """Создание новой переговорки."""
+    """Только для суперюзеров."""
     await check_name_duplicate(meeting_room.name, session)
     new_room = await meeting_room_crud.create(meeting_room, session)
     return new_room
@@ -61,13 +63,14 @@ async def get_meeting_room(room_id: int, session: SessionDep):
     "/{room_id}",
     response_model=MeetingRoomDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)],
 )
 async def update_meeting_room_by_id(
     room_id: int,
     obj_in: MeetingRoomUpdate,
     session: SessionDep,
 ):
-    """Обновление переговорки по id."""
+    """Только для суперюзеров."""
     room = await check_meeting_room_exists(room_id, session)
     if obj_in.name is not None and obj_in.name != room.name:
         await check_name_duplicate(obj_in.name, session)
@@ -79,9 +82,10 @@ async def update_meeting_room_by_id(
     "/{room_id}",
     response_model=MeetingRoomDB,
     response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)],
 )
 async def delete_meeting_room_by_id(room_id: int, session: SessionDep):
-    """Удаление переговорки по id."""
+    """Только для суперюзеров."""
     room = await check_meeting_room_exists(room_id, session)
     deleted_room = await meeting_room_crud.remove(room, session)
     return deleted_room
@@ -90,6 +94,7 @@ async def delete_meeting_room_by_id(room_id: int, session: SessionDep):
 @router.get(
     "/{meeting_room_id}/reservations",
     response_model=list[ReservationDB],
+    response_model_exclude={"user_id"},
 )
 async def get_reservations_for_room(
     meeting_room_id: int,
