@@ -12,5 +12,9 @@ wheels/
 # Environment variables (secrets)
 .env
 
+# Google API credentials
+oauth_client.json
+token.json
+
 # SQLite database files
 *.db

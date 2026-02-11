@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     secret: str = 'SECRET'
     first_superuser_email: EmailStr | None = None
     first_superuser_password: str | None = None
+    email: str | None = None
 
     model_config = SettingsConfigDict(env_file='.env')
 
