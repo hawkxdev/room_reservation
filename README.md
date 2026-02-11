@@ -9,6 +9,7 @@ API для бронирования переговорных комнат.
 - [Pydantic Settings 2.6.1](https://docs.pydantic.dev/latest/)
 - [SQLAlchemy 2.0 (async)](https://docs.sqlalchemy.org/)
 - [FastAPI Users 13.0.0](https://fastapi-users.github.io/fastapi-users/)
+- [aiogoogle 5.13.0](https://aiogoogle.readthedocs.io/) (Google Sheets/Drive API)
 - [Alembic 1.13.1](https://alembic.sqlalchemy.org/)
 
 ## Локальное развертывание
@@ -44,3 +45,4 @@ API документация: http://127.0.0.1:8000/docs
 | `SECRET` | Ключ для JWT токенов | — |
 | `FIRST_SUPERUSER_EMAIL` | Email суперпользователя | — |
 | `FIRST_SUPERUSER_PASSWORD` | Пароль суперпользователя | — |
+| `EMAIL` | Email для расшаривания Google Sheets | — |

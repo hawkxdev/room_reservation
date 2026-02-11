@@ -4,7 +4,7 @@ import json
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
-from aiogoogle import Aiogoogle
+from aiogoogle import Aiogoogle  # pyright: ignore[reportPrivateImportUsage]
 from aiogoogle.auth.creds import ClientCreds, UserCreds
 
 from app.core.config import settings
