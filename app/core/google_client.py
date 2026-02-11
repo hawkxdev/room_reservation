@@ -7,6 +7,20 @@ from pathlib import Path
 from aiogoogle import Aiogoogle  # pyright: ignore[reportPrivateImportUsage]
 from aiogoogle.auth.creds import ClientCreds, UserCreds
 
+# Monkey-patch: Google OAuth2 возвращает refresh_token_expires_in,
+# которое aiogoogle 5.13.0 не поддерживает.
+_original_init = UserCreds.__init__
+
+
+def _patched_init(
+    self: UserCreds, *args: object, **kwargs: object,
+) -> None:
+    kwargs.pop('refresh_token_expires_in', None)
+    _original_init(self, *args, **kwargs)
+
+
+UserCreds.__init__ = _patched_init  # type: ignore[method-assign]
+
 from app.core.config import settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -28,7 +42,7 @@ def _load_user_creds() -> UserCreds:
         refresh_token=token_data['refresh_token'],
         token_uri=token_data['token_uri'],
         scopes=token_data['scopes'],
-        expires_at=token_data.get('expiry'),
+        expires_at=token_data.get('expiry', '').replace('Z', ''),
     )
 
 
